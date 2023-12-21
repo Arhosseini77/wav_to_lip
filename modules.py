@@ -1,28 +1,62 @@
 import parselmouth
 import numpy as np
 
-def analyze_formants(audio_path):
+
+def analyze_formants_and_intensity(audio_path):
     sound = parselmouth.Sound(audio_path)
     formant = sound.to_formant_burg()
-    formant_data = []
+    intensity = sound.to_intensity()
+    analysis_data = []
+
+    # Extract intensity times and values, ensuring they are one-dimensional
+    intensity_times = intensity.xs()
+    intensity_values = intensity.values.flatten()  # Flatten to ensure 1D array
 
     for t in formant.t_grid():
         f1 = formant.get_value_at_time(1, t)
         f2 = formant.get_value_at_time(2, t)
+
+        # Find the index of the closest time in intensity_times to t
+        closest_time_index = np.abs(intensity_times - t).argmin()
+        # Ensure index is within bounds
+        if closest_time_index < len(intensity_values):
+            intensity_at_t = intensity_values[closest_time_index]
+        else:
+            continue
+
         if np.isnan(f1) or np.isnan(f2):
             continue
-        formant_data.append((t, f1, f2))
+        analysis_data.append((t, f1, f2, intensity_at_t))
 
-    return formant_data
+    return analysis_data
+
+
+def get_amplitude_value(audio_path):
+    sound = parselmouth.Sound(audio_path)
+    intensity = sound.to_intensity()
+    rms = np.sqrt(np.mean(intensity.values**2))
+    max_possible_rms = 1.0  # Adjust based on your audio format
+    normalized_rms = rms / max_possible_rms
+    return min(max(normalized_rms, 0), 1)
+
+
+def is_silent(intensity, silence_threshold=40):
+    return intensity < silence_threshold
+
 
 def map_to_vowel(f1, f2):
     vowels = {
-        "/i/": (270, 2290),
-        "/e/": (530, 1840),
-        "/a/": (660, 1720),
-        "/o/": (570, 840),
-        "/u/": (300, 870),
-        # Add more vowels as needed
+        "[i]": (280, 2230),
+        "[ɪ]": (370, 2090),
+        "[e]": (405, 2080),
+        "[ɛ]": (600, 1930),
+        "[æ]": (860, 1550),
+        "[ɑ]": (830, 1170),
+        "[ɔ]": (560, 820),
+        "[o]": (430, 980),
+        "[ʊ]": (400, 1100),
+        "[u]": (330, 1260),
+        "[ʌ]": (680, 1310),
     }
 
     closest_vowel = None
@@ -36,8 +70,9 @@ def map_to_vowel(f1, f2):
 
     return closest_vowel, smallest_distance
 
-def recognize_vowels(audio_path, threshold=150):
-    formants = analyze_formants(audio_path)
+
+def recognize_vowels(audio_path, threshold=50):
+    formants = analyze_formants_and_intensity(audio_path)
     vowel_occurrences = []
 
     for time, f1, f2 in formants:
@@ -47,8 +82,24 @@ def recognize_vowels(audio_path, threshold=150):
 
     return vowel_occurrences
 
-# Example usage
-audio_file = "/avir_checkpoint_878000.wav"
-vowels_detected = recognize_vowels(audio_file)
-for time, vowel in vowels_detected:
-    print(f"Time: {time:.3f} s, Vowel: {vowel}")
+
+def analyze_audio(audio_path):
+    analysis_data = analyze_formants_and_intensity(audio_path)
+
+    for time, f1, f2, intensity in analysis_data:
+        # Normalize and print amplitude value
+        normalized_intensity = min(max(intensity / 100, 0), 1)  # Assuming max intensity of 100 dB
+        print(f"At time {time:.2f}s, amplitude is {normalized_intensity:.2f}")
+
+        # Check for vowel
+        vowel, distance = map_to_vowel(f1, f2)
+        if distance <= 100:  # Threshold for vowel detection
+            print(f" --> Vowel {vowel} detected")
+
+        # Check for silence
+        if is_silent(intensity):
+            print(" --> Silent")
+
+
+audio_file = 'test_files/avir_checkpoint_878000.wav'
+analyze_audio(audio_file)
