@@ -70,17 +70,17 @@ def map_to_vowel(f1, f2):
 
     return closest_vowel, smallest_distance
 
-
-def recognize_vowels(audio_path, threshold=50):
-    formants = analyze_formants_and_intensity(audio_path)
-    vowel_occurrences = []
-
-    for time, f1, f2 in formants:
-        vowel, distance = map_to_vowel(f1, f2)
-        if distance <= threshold:
-            vowel_occurrences.append((time, vowel))
-
-    return vowel_occurrences
+#
+# def recognize_vowels(audio_path, threshold=20):
+#     formants = analyze_formants_and_intensity(audio_path)
+#     vowel_occurrences = []
+#
+#     for time, f1, f2 in formants:
+#         vowel, distance = map_to_vowel(f1, f2)
+#         if distance <= threshold:
+#             vowel_occurrences.append((time, vowel))
+#
+#     return vowel_occurrences
 
 
 def analyze_audio(audio_path):
@@ -89,17 +89,13 @@ def analyze_audio(audio_path):
     for time, f1, f2, intensity in analysis_data:
         # Normalize and print amplitude value
         normalized_intensity = min(max(intensity / 100, 0), 1)  # Assuming max intensity of 100 dB
-        print(f"At time {time:.2f}s, amplitude is {normalized_intensity:.2f}")
+        print(f"At time {time:.4f}s, amplitude is {normalized_intensity:.2f}")
 
         # Check for vowel
         vowel, distance = map_to_vowel(f1, f2)
-        if distance <= 100:  # Threshold for vowel detection
+        if distance <= 50:  # Threshold for vowel detection
             print(f" --> Vowel {vowel} detected")
 
         # Check for silence
         if is_silent(intensity):
             print(" --> Silent")
-
-
-audio_file = 'test_files/avir_checkpoint_878000.wav'
-analyze_audio(audio_file)
