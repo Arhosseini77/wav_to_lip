@@ -343,3 +343,5 @@ pyrightconfig.json
 
 git_avir_files/
 test_files/
+*.mp4
+*.wav
