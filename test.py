@@ -4,10 +4,10 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 from collections import Counter
 from modules import analyze_audio
 
-audio_file = 'test_files/voice_10-12-2023_08-01-37.wav'
+audio_file = 'test_files/voice_16-12-2023_18-08-46.wav'
 result = analyze_audio(audio_file)
 
-fps = 150
+fps = 30
 frame_duration = 1 / fps
 frame_width = 640
 frame_height = 480
@@ -61,3 +61,24 @@ final_video_file = 'lip_syncing_visualization_with_audio.mp4'
 video_clip_with_audio.write_videofile(final_video_file, codec="libx264")
 
 print(f"Video file with audio '{final_video_file}' created.")
+
+
+import json
+
+# Assuming 'result' and 'aggregated_result' are already defined
+# Convert tuples in the lists to dictionaries
+result_dicts = [{"time": time, "amplitude": amp, "status": status if status else "None"} for time, amp, status in result]
+aggregated_result_dicts = [{"time": time, "amplitude": amp, "status": status if status else "None"} for time, amp, status in aggregated_result]
+
+# Save to JSON files
+result_json_file = 'result.json'
+aggregated_result_json_file = 'aggregated_result.json'
+
+with open(result_json_file, 'w') as f:
+    json.dump(result_dicts, f, indent=4)
+
+with open(aggregated_result_json_file, 'w') as f:
+    json.dump(aggregated_result_dicts, f, indent=4)
+
+print(f"Saved 'result' to {result_json_file}")
+print(f"Saved 'aggregated_result' to {aggregated_result_json_file}")
