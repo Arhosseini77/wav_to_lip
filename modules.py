@@ -73,17 +73,21 @@ def map_to_vowel(f1, f2):
 
 def analyze_audio(audio_path):
     analysis_data = analyze_formants_and_intensity(audio_path)
+    result = []
 
     for time, f1, f2, intensity in analysis_data:
-        # Normalize intensity
-        normalized_intensity = min(max(intensity / 100, 0), 1)  # Assuming max intensity of 100 dB
-        print(f"At time {time:.4f}s, amplitude is {normalized_intensity:.2f}")
+        # Normalize intensity: Map 50 to 0 and 100 to 1
+        normalized_intensity = (intensity - 50) / 50
+        normalized_intensity = min(max(normalized_intensity, 0), 1)
 
-        # Check for silence first
-        if is_silent(normalized_intensity, silence_threshold=50):
-            print(" --> Silent")
+        # Check for silence or vowel and prepare output tuple
+        if is_silent(normalized_intensity * 100, silence_threshold=50):  # Use original scale for silence check
+            result.append((time, normalized_intensity, "Silent"))
         else:
-            # Perform vowel detection if not silent
             vowel, distance = map_to_vowel(f1, f2)
             if distance <= 50:  # Threshold for vowel detection
-                print(f" --> Vowel {vowel} detected")
+                result.append((time, normalized_intensity, vowel))
+            else:
+                result.append((time, normalized_intensity, None))
+
+    return result
