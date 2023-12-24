@@ -8,7 +8,7 @@ audio_file = 'test_files/voice_10-12-2023_08-01-37.wav'
 result = analyze_audio(audio_file)
 
 fps = 150
-frame_duration = 1 / fps  # Duration of each frame in seconds
+frame_duration = 1 / fps
 frame_width = 640
 frame_height = 480
 video_file = 'lip_syncing_visualization.avi'
@@ -37,7 +37,7 @@ for time, amp, status in aggregated_result:
 
     # Calculate line positions based on amplitude
     center_y = frame_height // 2
-    line_offset = int(amp * 100)  # Adjust the multiplier for more dramatic effect if needed
+    line_offset = int(amp * 100)
 
     # Draw the lines
     cv2.line(frame, (0, center_y - line_offset), (frame_width, center_y - line_offset), (255, 0, 0), 2)
