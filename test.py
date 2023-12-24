@@ -4,10 +4,10 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 from collections import Counter
 from modules import analyze_audio
 
-audio_file = 'test_files/only_silent.mp3'
+audio_file = 'test_files/voice_10-12-2023_08-01-37.wav'
 result = analyze_audio(audio_file)
 
-fps = 30
+fps = 150
 frame_duration = 1 / fps  # Duration of each frame in seconds
 frame_width = 640
 frame_height = 480

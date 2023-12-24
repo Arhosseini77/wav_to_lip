@@ -85,7 +85,7 @@ def analyze_audio(audio_path):
             result.append((time, normalized_intensity, "Silent"))
         else:
             vowel, distance = map_to_vowel(f1, f2)
-            if distance <= 50:  # Threshold for vowel detection
+            if distance <= 100:  # Threshold for vowel detection
                 result.append((time, normalized_intensity, vowel))
             else:
                 result.append((time, normalized_intensity, None))
