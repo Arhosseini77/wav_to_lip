@@ -31,3 +31,8 @@ change audio path in main.py
 ```python
 python main.py
 ```
+
+For visualization:
+```python
+python test.py
+```
