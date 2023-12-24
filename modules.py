@@ -79,13 +79,12 @@ def analyze_audio(audio_path):
         # Normalize intensity: Map 50 to 0 and 100 to 1
         normalized_intensity = (intensity - 50) / 50
         normalized_intensity = min(max(normalized_intensity, 0), 1)
-
         # Check for silence or vowel and prepare output tuple
-        if is_silent(normalized_intensity * 100, silence_threshold=50):  # Use original scale for silence check
-            result.append((time, normalized_intensity, "Silent"))
+        if is_silent(normalized_intensity * 100, silence_threshold=0):  # Use original scale for silence check
+            result.append((time, 0, "Silent"))
         else:
             vowel, distance = map_to_vowel(f1, f2)
-            if distance <= 100:  # Threshold for vowel detection
+            if distance <= 150:  # Threshold for vowel detection
                 result.append((time, normalized_intensity, vowel))
             else:
                 result.append((time, normalized_intensity, None))
