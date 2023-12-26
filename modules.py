@@ -94,7 +94,7 @@ def analyze_audio(audio_path):
                 if distance <= 50:  # Threshold for vowel detection
                     result.append((time, normalized_intensity, vowel))
                     last_vowel = vowel
-                    repeat_count = 5
+                    repeat_count = 10
                 else:
                     result.append((time, normalized_intensity, None))
                     last_vowel = None
