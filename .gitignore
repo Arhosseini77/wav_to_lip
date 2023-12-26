@@ -347,3 +347,4 @@ test_files/
 *.wav
 *.avi
 *.zip
+*.json
