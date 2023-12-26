@@ -4,7 +4,7 @@ from moviepy.editor import VideoFileClip, AudioFileClip
 from collections import Counter
 from modules import analyze_audio
 
-audio_file = 'test_files/voice_16-12-2023_18-08-46.wav'
+audio_file = 'test_files/tts_checkpoint.wav'
 result = analyze_audio(audio_file)
 
 fps = 30

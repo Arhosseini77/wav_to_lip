@@ -46,17 +46,16 @@ def is_silent(intensity, silence_threshold=50):
 
 def map_to_vowel(f1, f2):
     vowels = {
-        "[i]": (280, 2230),
-        "[ɪ]": (370, 2090),
-        "[e]": (405, 2080),
-        "[ɛ]": (600, 1930),
-        "[æ]": (860, 1550),
-        "[ɑ]": (830, 1170),
-        "[ɔ]": (560, 820),
-        "[o]": (430, 980),
-        "[ʊ]": (400, 1100),
-        "[u]": (330, 1260),
-        "[ʌ]": (680, 1310),
+        "long_ee": (280, 2230),   # [i] like "team"
+        "short_ee": (370, 2090),  # [ɪ] like "ear"
+        "short_e": (405, 2080),   # [e] like "hair"
+        "long_e": (600, 1930),    # [ɛ] like "Turn"
+        "short_aa": (860, 1550),  # [æ] like "Cat"
+        "long_aa": (830, 1170),   # [ɑ] like "Fast"
+        "long_a": (560, 820),     # [ɔ] like "Talk"
+        "short_ou": (400, 1100),  # [ʊ] like put
+        "long_ou": (330, 1260),   # [u] like "boot"
+        "short_a": (680, 1310),   # [ʌ] like "Fun"
     }
 
     closest_vowel = None
