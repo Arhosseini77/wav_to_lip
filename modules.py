@@ -73,6 +73,7 @@ def map_to_vowel(f1, f2):
 def analyze_audio(audio_path):
     analysis_data = analyze_formants_and_intensity(audio_path)
     result = []
+    last_five_entries = []
     repeat_count = 0
 
     for time, f1, f2, intensity in analysis_data:
@@ -81,22 +82,36 @@ def analyze_audio(audio_path):
         normalized_intensity = min(max(normalized_intensity, 0), 1)
         # Check for silence or vowel and prepare output tuple
         if is_silent(normalized_intensity * 100, silence_threshold=0):
-            result.append((time, 0, "Silent"))
+            current_entry = (time, 0, "Silent")
             last_vowel = None
             repeat_count = 0
         else:
             if repeat_count > 0:
-                # Repeat the last vowel for four timestamps
-                result.append((time, normalized_intensity, last_vowel))
+                current_entry = (time, normalized_intensity, last_vowel)
                 repeat_count -= 1
             else:
                 vowel, distance = map_to_vowel(f1, f2)
                 if distance <= 50:  # Threshold for vowel detection
-                    result.append((time, normalized_intensity, vowel))
+                    current_entry = (time, normalized_intensity, vowel)
                     last_vowel = vowel
-                    repeat_count = 10
+                    repeat_count = 5
+
+                    # Overwrite the last five entries if a vowel is detected
+                    for i in range(len(last_five_entries)):
+                        if last_five_entries[i][2] != "Silent":
+                            last_five_entries[i] = (last_five_entries[i][0], last_five_entries[i][1], vowel)
                 else:
-                    result.append((time, normalized_intensity, None))
+                    current_entry = (time, normalized_intensity, None)
                     last_vowel = None
+
+            # Update the result and the last_five_entries buffer
+        last_five_entries.append(current_entry)
+        if len(last_five_entries) > 5:
+            result.append(last_five_entries.pop(0))
+        else:
+            result.append(current_entry)
+
+        # Add any remaining entries from the buffer to the result
+    result.extend(last_five_entries[1:])
 
     return result
