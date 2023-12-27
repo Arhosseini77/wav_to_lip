@@ -1,7 +1,7 @@
 from modules import analyze_audio
 import json
 
-audio_file = 'test_files/only_silent.mp3'
+audio_file = 'test_files/tts2/6.wav'
 name = audio_file.split("/")[-1].split(".")[0]
 result = analyze_audio(audio_file)
 
