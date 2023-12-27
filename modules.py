@@ -44,68 +44,31 @@ def is_silent(intensity, silence_threshold=50):
     return intensity < silence_threshold
 
 
-# def map_to_vowel(f1, f2):
-#     vowels = {
-#         "long_ee": (280, 2230),   # [i] like "team"
-#         "short_ee": (370, 2090),  # [ɪ] like "ear"
-#         "short_e": (405, 2080),   # [e] like "hair"
-#         "long_e": (600, 1930),    # [ɛ] like "Turn"
-#         "short_aa": (860, 1550),  # [æ] like "Cat"
-#         "long_aa": (830, 1170),   # [ɑ] like "Fast"
-#         "long_a": (560, 820),     # [ɔ] like "Talk"
-#         "short_ou": (400, 1100),  # [ʊ] like put
-#         "long_ou": (330, 1260),   # [u] like "boot"
-#         "short_a": (680, 1310),   # [ʌ] like "Fun"
-#     }
-#
-#     closest_vowel = None
-#     smallest_distance = float('inf')
-#
-#     for vowel, (ref_f1, ref_f2) in vowels.items():
-#         distance = np.sqrt((ref_f1 - f1)**2 + (ref_f2 - f2)**2)
-#         if distance < smallest_distance:
-#             smallest_distance = distance
-#             closest_vowel = vowel
-#
-#     return closest_vowel, smallest_distance
-
 def map_to_vowel(f1, f2):
     vowels = {
-        "long_ee": (280, 2230),  # [i] like "team"
-        "short_ee": (370, 2090), # [ɪ] like "ear"
-        "short_e": (405, 2080),  # [e] like "hair"
-        "long_e": (600, 1930),   # [ɛ] like "Turn"
-        "short_aa": (860, 1550), # [æ] like "Cat"
-        "long_aa": (830, 1170),  # [ɑ] like "Fast"
-        "long_a": (560, 820),    # [ɔ] like "Talk"
-        "short_ou": (400, 1100), # [ʊ] like put
-        "long_ou": (330, 1260),  # [u] like "boot"
-        "short_a": (680, 1310),  # [ʌ] like "Fun"
+        "long_ee": (280, 2230),   # [i] like "team"
+        "short_ee": (370, 2090),  # [ɪ] like "ear"
+        "short_e": (405, 2080),   # [e] like "hair"
+        "long_e": (600, 1930),    # [ɛ] like "Turn"
+        "short_aa": (860, 1550),  # [æ] like "Cat"
+        "long_aa": (830, 1170),   # [ɑ] like "Fast"
+        "long_a": (560, 820),     # [ɔ] like "Talk"
+        "short_ou": (400, 1100),  # [ʊ] like put
+        "long_ou": (330, 1260),   # [u] like "boot"
+        "short_a": (680, 1310),   # [ʌ] like "Fun"
     }
 
-    # Special treatment for 'ou' vowels
-    ou_threshold = 40  # Lower threshold for 'ou' vowels
-    for ou_vowel in ["short_ou", "long_ou"]:
-        ref_f1, ref_f2 = vowels[ou_vowel]
-        distance = np.sqrt((ref_f1 - f1)**2 + (ref_f2 - f2)**2)
-        if distance < ou_threshold:
-            return ou_vowel, distance
-
-    # General treatment for other vowels
     closest_vowel = None
     smallest_distance = float('inf')
-    general_threshold = 50  # General threshold for other vowels
 
     for vowel, (ref_f1, ref_f2) in vowels.items():
-        if vowel in ["short_ou", "long_ou"]:
-            continue  # Skip 'ou' vowels as they are already checked
         distance = np.sqrt((ref_f1 - f1)**2 + (ref_f2 - f2)**2)
-        if distance < general_threshold and distance < smallest_distance:
+        if distance < smallest_distance:
             smallest_distance = distance
             closest_vowel = vowel
+            #print("vowel: " ,  closest_vowel , " distance : " , smallest_distance )
 
     return closest_vowel, smallest_distance
-
 
 
 def analyze_audio(audio_path):
@@ -129,7 +92,11 @@ def analyze_audio(audio_path):
                 repeat_count -= 1
             else:
                 vowel, distance = map_to_vowel(f1, f2)
-                if distance <= 50:  # Threshold for vowel detection
+                if vowel ==  "long_ou" or vowel ==  "short_ou":
+                    th = 70
+                else:
+                    th = 50
+                if distance <= th:
                     current_entry = (time, normalized_intensity, vowel)
                     last_vowel = vowel
                     repeat_count = 7
