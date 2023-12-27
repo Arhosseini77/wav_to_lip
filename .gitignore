@@ -348,3 +348,4 @@ test_files/
 *.avi
 *.zip
 *.json
+build_front/
